@@ -1,0 +1,84 @@
+﻿@model AnnouncementsViewModel
+@{
+    ViewData["Title"] = "Announcements";
+}
+
+<h1 class="mb-3">Ogłoszenia</h1>
+
+<form id="filterForm">
+    <div class="form-row align-items-center">
+        <div class="col-auto">
+            @Html.TextBoxFor(x => x.FilterAnnouncements.Title,
+            new { @class = "form-control mb-2", placeholder = "Tytuł" })
+        </div>
+        <div class="col-auto">
+            @Html.DropDownListFor(x => x.FilterAnnouncements.CategoryId,
+                new SelectList(Model.Categories, "Id", "Name"),
+                "-- wybierz kategorię --",
+                new { @class = "form-control mb-2" })
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary mb-2">Szukaj</button>
+        </div>
+    </div>
+</form>
+
+<div>
+    @await Html.PartialAsync("_AnnouncementsTable.cshtml", Model.Announcements)
+</div>
+
+@section Scripts
+    {
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            $('#filterForm').submit(function () {
+
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("Announcements", "Announcement")",
+                    data: $(this).serialize(),
+                    success: function (data) {
+                        $('#announcementsTable').html(data);
+                    },
+                    error: function (data) {
+                        alert(data.message)
+                    },
+                    dataType: "html"
+                });
+
+                return false;
+            });
+
+        });
+
+        function deleteAnnouncement(id, btn) {
+
+            if (!confirm("Czy na pewno chcesz usunąć zadanie?"))
+                return;
+
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("Delete", "Announcement")",
+                data: {
+                    id: id
+                },
+                success: function (data) {
+                    if (data.success) {
+                        var row = btn.parentNode.parentNode;
+                        row.parentNode.removeChild(row);
+                    } else {
+                        alert(data.message);
+                    }
+                },
+                error: function (data) {
+                    alert(data.message)
+                },
+                dataType: "json"
+            });
+
+        }
+
+    </script>
+}
