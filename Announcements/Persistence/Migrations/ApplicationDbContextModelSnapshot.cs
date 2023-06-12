@@ -84,16 +84,11 @@ namespace Announcements.Data.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("ApplicationUserId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ApplicationUserId");
 
                     b.ToTable("Categories");
                 });
@@ -314,7 +309,7 @@ namespace Announcements.Data.Migrations
             modelBuilder.Entity("Announcements.Core.Domains.Announcement", b =>
                 {
                     b.HasOne("Announcements.Core.Models.Domains.Category", "Category")
-                        .WithMany("Announcements")
+                        .WithMany()
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -331,13 +326,6 @@ namespace Announcements.Data.Migrations
                         .HasForeignKey("AnnouncementId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("Announcements.Core.Models.Domains.Category", b =>
-                {
-                    b.HasOne("Announcements.Core.Models.Domains.ApplicationUser", null)
-                        .WithMany("Categories")
-                        .HasForeignKey("ApplicationUserId");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

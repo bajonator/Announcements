@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Announcements.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230610221206_inits")]
-    partial class inits
+    [Migration("20230612084042_init")]
+    partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -57,6 +57,26 @@ namespace Announcements.Data.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Announcements");
+                });
+
+            modelBuilder.Entity("Announcements.Core.Models.Domains.AnnouncementPicture", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("AnnouncementId")
+                        .HasColumnType("int");
+
+                    b.Property<byte[]>("ImageData")
+                        .HasColumnType("varbinary(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AnnouncementId");
+
+                    b.ToTable("Pictures");
                 });
 
             modelBuilder.Entity("Announcements.Core.Models.Domains.Category", b =>
@@ -304,6 +324,15 @@ namespace Announcements.Data.Migrations
                     b.HasOne("Announcements.Core.Models.Domains.ApplicationUser", "User")
                         .WithMany("Announcements")
                         .HasForeignKey("UserId");
+                });
+
+            modelBuilder.Entity("Announcements.Core.Models.Domains.AnnouncementPicture", b =>
+                {
+                    b.HasOne("Announcements.Core.Domains.Announcement", "Announcement")
+                        .WithMany("Pictures")
+                        .HasForeignKey("AnnouncementId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Announcements.Core.Models.Domains.Category", b =>

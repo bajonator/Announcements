@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Announcements.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230610125140_dd")]
-    partial class dd
+    [Migration("20230612085306_removeUserRequiredInCategory")]
+    partial class removeUserRequiredInCategory
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -39,6 +39,9 @@ namespace Announcements.Data.Migrations
                         .HasColumnType("nvarchar(250)")
                         .HasMaxLength(250);
 
+                    b.Property<decimal?>("Price")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("nvarchar(50)")
@@ -56,6 +59,26 @@ namespace Announcements.Data.Migrations
                     b.ToTable("Announcements");
                 });
 
+            modelBuilder.Entity("Announcements.Core.Models.Domains.AnnouncementPicture", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("AnnouncementId")
+                        .HasColumnType("int");
+
+                    b.Property<byte[]>("ImageData")
+                        .HasColumnType("varbinary(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AnnouncementId");
+
+                    b.ToTable("Pictures");
+                });
+
             modelBuilder.Entity("Announcements.Core.Models.Domains.Category", b =>
                 {
                     b.Property<int>("Id")
@@ -63,16 +86,11 @@ namespace Announcements.Data.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("ApplicationUserId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ApplicationUserId");
 
                     b.ToTable("Categories");
                 });
@@ -293,7 +311,7 @@ namespace Announcements.Data.Migrations
             modelBuilder.Entity("Announcements.Core.Domains.Announcement", b =>
                 {
                     b.HasOne("Announcements.Core.Models.Domains.Category", "Category")
-                        .WithMany("Announcements")
+                        .WithMany()
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -303,11 +321,13 @@ namespace Announcements.Data.Migrations
                         .HasForeignKey("UserId");
                 });
 
-            modelBuilder.Entity("Announcements.Core.Models.Domains.Category", b =>
+            modelBuilder.Entity("Announcements.Core.Models.Domains.AnnouncementPicture", b =>
                 {
-                    b.HasOne("Announcements.Core.Models.Domains.ApplicationUser", null)
-                        .WithMany("Categories")
-                        .HasForeignKey("ApplicationUserId");
+                    b.HasOne("Announcements.Core.Domains.Announcement", "Announcement")
+                        .WithMany("Pictures")
+                        .HasForeignKey("AnnouncementId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

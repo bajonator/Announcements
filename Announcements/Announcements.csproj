@@ -8,6 +8,10 @@
   <ItemGroup>
     <Compile Remove="Persistence\Migrations\20230610124913_ddd.cs" />
     <Compile Remove="Persistence\Migrations\20230610124913_ddd.Designer.cs" />
+    <Compile Remove="Persistence\Migrations\20230612083606_init.cs" />
+    <Compile Remove="Persistence\Migrations\20230612083606_init.Designer.cs" />
+    <Compile Remove="Persistence\Migrations\20230612084020_init.cs" />
+    <Compile Remove="Persistence\Migrations\20230612084020_init.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

@@ -10,10 +10,8 @@ namespace Announcements.Core.Models.Domains
         public ApplicationUser()
         {
             Announcements = new Collection<Announcement>();
-            Categories = new Collection<Category>();
         }
 
         public ICollection<Announcement> Announcements { get; set; }
-        public ICollection<Category> Categories { get; set; }
     }
 }
