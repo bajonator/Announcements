@@ -5,8 +5,14 @@ using Announcements.Core.ViewModels;
 using Announcements.Persistence;
 using Announcements.Persistence.Extensions;
 using Announcements.Persistence.Repositories;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.VisualBasic;
 using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Announcements.Controllers
 {
@@ -25,12 +31,25 @@ namespace Announcements.Controllers
             {
                 FilterAnnouncements = new FilterAnnouncements(),
                 Announcements = _announcementRepository.Get(userId),
-                Categories = _announcementRepository.GetCategories()
+                Categories = _announcementRepository.GetCategories(),
             };
 
             return View(vm);
         }
 
+        public IActionResult AnnouncementPreview(int id)
+        {
+            var announcement = _announcementRepository.GetPreview(id);
+
+            var vm = new AnnouncementViewModel
+            {
+                Announcement = announcement,
+                Categories = _announcementRepository.GetCategories(),
+                Pictures = _announcementRepository.GetPictures(id)
+            };
+
+            return View(vm);
+        }
         [HttpPost]
         public IActionResult Announcements(AnnouncementsViewModel viewModel)
         {
@@ -38,7 +57,8 @@ namespace Announcements.Controllers
 
             var announcements = _announcementRepository.Get(userId,
                 viewModel.FilterAnnouncements.CategoryId,
-                viewModel.FilterAnnouncements.Title);
+                viewModel.FilterAnnouncements.Title,
+                viewModel.Pictures);
 
             return PartialView("_AnnouncementsTable", announcements);
         }
@@ -55,7 +75,8 @@ namespace Announcements.Controllers
                 Announcement = announcement,
                 Heading = id == 0 ?
                 "Dodawanie nowego ogłoszenia" : "Edytowanie ogłoszenia",
-                Categories = _announcementRepository.GetCategories()
+                Categories = _announcementRepository.GetCategories(),
+                Pictures= _announcementRepository.GetPictures(id)                
             };
 
             return View(vm);
@@ -63,10 +84,12 @@ namespace Announcements.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Announcement(Announcement announcement)
+        public IActionResult Announcement(Announcement announcement, List<IFormFile> files)
         {
             var userId = User.GetUserId();
             announcement.UserId = userId;
+
+            AddPhoto(announcement);
 
             if (!ModelState.IsValid)
             {
@@ -75,7 +98,8 @@ namespace Announcements.Controllers
                     Announcement = announcement,
                     Heading = announcement.Id == 0 ?
                     "Dodawanie nowego ogłoszenia" : "Edytowanie ogłoszenia",
-                    Categories = _announcementRepository.GetCategories()
+                    Categories = _announcementRepository.GetCategories(),
+                    Pictures = _announcementRepository.GetPictures(announcement.Id)
                 };
 
                 return View("Announcement", vm);
@@ -87,6 +111,29 @@ namespace Announcements.Controllers
                 _announcementRepository.Update(announcement);
 
             return RedirectToAction("Announcements");
+        }
+
+        private void AddPhoto(Announcement announcement)
+        {
+            var photos = Request.Form.Files;
+
+            if (photos != null && photos.Count > 0)
+            {
+                announcement.Pictures = new List<AnnouncementPicture>();
+
+                foreach (var photo in photos)
+                {
+                    using (var memoryStream = new MemoryStream())
+                    {
+                        photo.CopyTo(memoryStream);
+                        var picture = new AnnouncementPicture
+                        {
+                            ImageData = memoryStream.ToArray(),
+                        };
+                        announcement.Pictures.Add(picture);
+                    }
+                }
+            }
         }
 
         [HttpPost]

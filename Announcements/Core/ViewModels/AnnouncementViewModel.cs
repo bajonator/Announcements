@@ -10,5 +10,6 @@ namespace Announcements.Core.ViewModels
         public string Heading { get; set; }
         public Announcement Announcement { get; set; }
         public IEnumerable<Category> Categories { get; set; }
+        public IEnumerable<AnnouncementPicture> Pictures { get; set; }
     }
 }

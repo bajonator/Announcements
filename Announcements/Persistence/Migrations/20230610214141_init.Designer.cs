@@ -4,14 +4,16 @@ using Announcements.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Announcements.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230610214141_init")]
+    partial class init
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -37,7 +39,7 @@ namespace Announcements.Data.Migrations
                         .HasColumnType("nvarchar(250)")
                         .HasMaxLength(250);
 
-                    b.Property<decimal?>("Price")
+                    b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Title")
@@ -55,26 +57,6 @@ namespace Announcements.Data.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Announcements");
-                });
-
-            modelBuilder.Entity("Announcements.Core.Models.Domains.AnnouncementPicture", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int>("AnnouncementId")
-                        .HasColumnType("int");
-
-                    b.Property<byte[]>("ImageData")
-                        .HasColumnType("varbinary(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AnnouncementId");
-
-                    b.ToTable("Pictures");
                 });
 
             modelBuilder.Entity("Announcements.Core.Models.Domains.Category", b =>
@@ -322,15 +304,6 @@ namespace Announcements.Data.Migrations
                     b.HasOne("Announcements.Core.Models.Domains.ApplicationUser", "User")
                         .WithMany("Announcements")
                         .HasForeignKey("UserId");
-                });
-
-            modelBuilder.Entity("Announcements.Core.Models.Domains.AnnouncementPicture", b =>
-                {
-                    b.HasOne("Announcements.Core.Domains.Announcement", "Announcement")
-                        .WithMany("Pictures")
-                        .HasForeignKey("AnnouncementId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Announcements.Core.Models.Domains.Category", b =>

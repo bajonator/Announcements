@@ -11,6 +11,6 @@ namespace Announcements.Core.ViewModels
         public IEnumerable<Announcement> Announcements { get; set; }
         public IEnumerable<Category> Categories { get; set; }
         public FilterAnnouncements FilterAnnouncements { get; set; }
-        
+        public IEnumerable<AnnouncementPicture> Pictures { get; set; }
     }
 }

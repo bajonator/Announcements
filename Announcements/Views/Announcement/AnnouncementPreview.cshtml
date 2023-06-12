@@ -1,0 +1,58 @@
+﻿@model Announcements.Core.ViewModels.AnnouncementViewModel
+@{
+    ViewData["Title"] = "Podgląd";
+    var picturesList = Model.Announcement.Pictures.ToList();
+}
+
+<h1 class="text-center mt-5"><strong>@Model.Announcement.Title</strong></h1>
+
+<div class="text-center mt-5">
+    <div class="row justify-content-center bg-danger rounded">
+        <div class="col-6">
+            <h2 class="mt-2">Kategoria</h2>
+            <div class="p-3 rounded-end">
+                <strong>@Model.Announcement.Category.Name</strong>
+            </div>
+        </div>
+        <div class="col-6">
+            <h2 class="mt-2">Cena:</h2>
+            <div class="p-3 rounded-end">
+                @if (Model.Announcement.Price != 0 && Model.Announcement.Price != null)
+                {
+                    <p><strong>@Model.Announcement.Price zł</strong></p>
+                }
+            </div>
+        </div>
+    </div>
+    <div id="carouselExample" class="carousel slide mt-2 mb-2 border border-dark rounded">
+        <div class="carousel-inner">
+            @foreach (var picture in Model.Announcement.Pictures)
+            {
+                int index = picturesList.IndexOf(picture);
+
+                <div class="carousel-item @(index == 0 ? "active" : "")" id="image@(index)">
+                    <img src="data:image;base64,@Convert.ToBase64String(picture.ImageData)" class="img-thumbnail" width="600" height="800">
+                </div>
+            }
+        </div>
+        @if (Model.Announcement.Pictures.Count > 1)
+        {
+            <button class="carousel-control-prev btn-dark rounded-lg ml-2 mt-auto mb-auto" style="width:40px; height:250px" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon small-icon" aria-hidden="true"></span>
+                <span class="visually-hidden"></span>
+            </button>
+            <button class="carousel-control-next btn-dark rounded-lg mr-2 mt-auto mb-auto" style="width:40px; height:250px" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
+                <span class="carousel-control-next-icon small-icon" aria-hidden="true"></span>
+            </button>
+        }
+    </div>
+    <div class="p-3 bg-opacity-30 bg-info border-info rounded">
+        <h2>Opis:</h2>
+        <strong>@Model.Announcement.Description</strong>
+    </div>
+    <div class="mt-4">
+        <button class="btn btn-dark" style="width: 150px; height: 60px" onclick='window.location.href="@Url.Action("Announcements")"'>Wstecz</button>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

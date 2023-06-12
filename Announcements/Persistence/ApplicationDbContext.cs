@@ -17,5 +17,6 @@ namespace Announcements.Persistence
 
         public DbSet<Announcement> Announcements { get; set; }
         public DbSet<Category> Categories { get; set; }
+        public DbSet<AnnouncementPicture> Pictures { get; set; }
     }
 }
