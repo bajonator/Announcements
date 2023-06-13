@@ -1,5 +1,7 @@
-﻿using Announcements.Core.Domains;
+﻿using Announcements.Core;
+using Announcements.Core.Domains;
 using Announcements.Core.Models.Domains;
+using Announcements.Core.Repositories;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections;
@@ -8,11 +10,11 @@ using System.Linq;
 
 namespace Announcements.Persistence.Repositories
 {
-    public class AnnouncementRepository
+    public class AnnouncementRepository : IAnnouncementRepository
     {
-        private ApplicationDbContext _context;
+        private IApplicationDbContext _context;
 
-        public AnnouncementRepository(ApplicationDbContext context) 
+        public AnnouncementRepository(IApplicationDbContext context) 
         {
             _context = context;
         }
@@ -50,14 +52,12 @@ namespace Announcements.Persistence.Repositories
             announcementToUpdate.Title = announcement.Title;
             announcementToUpdate.Pictures = announcement.Pictures;
             
-            _context.SaveChanges();
         }
 
         public void Add(Announcement announcement)
         {
             announcement.AddDate = DateTime.Now;
             _context.Announcements.Add(announcement);
-            _context.SaveChanges();
         }
 
         public void Delete(int id, string userId)
@@ -66,7 +66,6 @@ namespace Announcements.Persistence.Repositories
                 .Single(x => x.Id == id && x.UserId == userId);
 
             _context.Announcements.Remove(announcementToDelete);
-            _context.SaveChanges();
         }
 
         public Announcement GetPreview(int id)
@@ -76,7 +75,7 @@ namespace Announcements.Persistence.Repositories
             return announcement;
         }
 
-        internal IEnumerable<AnnouncementPicture> GetPictures(int id)
+        public IEnumerable<AnnouncementPicture> GetPictures(int id)
         {
             return _context.Pictures.Where(x => x.AnnouncementId == id).ToList();
         }

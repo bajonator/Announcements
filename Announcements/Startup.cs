@@ -1,5 +1,8 @@
+using Announcements.Core;
 using Announcements.Core.Models.Domains;
+using Announcements.Core.Service;
 using Announcements.Persistence;
+using Announcements.Persistence.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -28,6 +31,10 @@ namespace Announcements
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddScoped<IAnnouncementService, AnnouncementService>();
+            services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));

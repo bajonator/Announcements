@@ -1,10 +1,12 @@
 ﻿using Announcements.Core.Domains;
 using Announcements.Core.Models;
 using Announcements.Core.Models.Domains;
+using Announcements.Core.Service;
 using Announcements.Core.ViewModels;
 using Announcements.Persistence;
 using Announcements.Persistence.Extensions;
 using Announcements.Persistence.Repositories;
+using Announcements.Persistence.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualBasic;
@@ -18,10 +20,11 @@ namespace Announcements.Controllers
 {
     public class AnnouncementController : Controller
     {
-        private AnnouncementRepository _announcementRepository;
-        public AnnouncementController(ApplicationDbContext context)
+        private IAnnouncementService _announcementService;
+
+        public AnnouncementController(IAnnouncementService announcementService)
         {
-            _announcementRepository = new AnnouncementRepository(context);
+            _announcementService = announcementService;
         }
         public IActionResult Announcements()
         {
@@ -30,8 +33,8 @@ namespace Announcements.Controllers
             var vm = new AnnouncementsViewModel
             {
                 FilterAnnouncements = new FilterAnnouncements(),
-                Announcements = _announcementRepository.Get(userId),
-                Categories = _announcementRepository.GetCategories(),
+                Announcements = _announcementService.Get(userId),
+                Categories = _announcementService.GetCategories(),
             };
 
             return View(vm);
@@ -39,13 +42,13 @@ namespace Announcements.Controllers
 
         public IActionResult AnnouncementPreview(int id)
         {
-            var announcement = _announcementRepository.GetPreview(id);
+            var announcement = _announcementService.GetPreview(id);
 
             var vm = new AnnouncementViewModel
             {
                 Announcement = announcement,
-                Categories = _announcementRepository.GetCategories(),
-                Pictures = _announcementRepository.GetPictures(id)
+                Categories = _announcementService.GetCategories(),
+                Pictures = _announcementService.GetPictures(id)
             };
 
             return View(vm);
@@ -55,7 +58,7 @@ namespace Announcements.Controllers
         {
             var userId = User.GetUserId();
 
-            var announcements = _announcementRepository.Get(userId,
+            var announcements = _announcementService.Get(userId,
                 viewModel.FilterAnnouncements.CategoryId,
                 viewModel.FilterAnnouncements.Title,
                 viewModel.Pictures);
@@ -68,15 +71,15 @@ namespace Announcements.Controllers
             var userId = User.GetUserId();
 
             var announcement = id == 0 ?
-                new Announcement { Id = 0, AddDate = DateTime.Today } : _announcementRepository.Get(id, userId);
+                new Announcement { Id = 0, AddDate = DateTime.Today } : _announcementService.Get(id, userId);
 
             var vm = new AnnouncementViewModel
             {
                 Announcement = announcement,
                 Heading = id == 0 ?
                 "Dodawanie nowego ogłoszenia" : "Edytowanie ogłoszenia",
-                Categories = _announcementRepository.GetCategories(),
-                Pictures= _announcementRepository.GetPictures(id)                
+                Categories = _announcementService.GetCategories(),
+                Pictures= _announcementService.GetPictures(id)                
             };
 
             return View(vm);
@@ -98,17 +101,18 @@ namespace Announcements.Controllers
                     Announcement = announcement,
                     Heading = announcement.Id == 0 ?
                     "Dodawanie nowego ogłoszenia" : "Edytowanie ogłoszenia",
-                    Categories = _announcementRepository.GetCategories(),
-                    Pictures = _announcementRepository.GetPictures(announcement.Id)
+                    Categories = _announcementService.GetCategories(),
+                    Pictures = _announcementService.GetPictures(announcement.Id)
                 };
 
                 return View("Announcement", vm);
             }
 
             if (announcement.Id == 0)
-                _announcementRepository.Add(announcement);
+                _announcementService.Add(announcement);
             else
-                _announcementRepository.Update(announcement);
+                _announcementService.Update(announcement);
+
 
             return RedirectToAction("Announcements");
         }
@@ -142,7 +146,7 @@ namespace Announcements.Controllers
             try
             {
                 var userId = User.GetUserId();
-                _announcementRepository.Delete(id, userId);
+                _announcementService.Delete(id, userId);
             }
             catch (Exception ex)
             {
