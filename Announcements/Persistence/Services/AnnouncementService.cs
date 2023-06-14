@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System;
 using Announcements.Core.Service;
 using Announcements.Core;
+using Microsoft.AspNetCore.Http;
+using System.IO;
 
 namespace Announcements.Persistence.Services
 {
@@ -50,13 +52,36 @@ namespace Announcements.Persistence.Services
         }
 
         public Announcement GetPreview(int id)
-        { 
+        {
             return _unitOfWork.Announcement.GetPreview(id);
         }
 
         public IEnumerable<AnnouncementPicture> GetPictures(int id)
         {
             return _unitOfWork.Announcement.GetPictures(id);
+        }
+
+        public void AddPhoto(Announcement announcement, List<IFormFile> files)
+        {
+
+            if (files != null && files.Count > 0)
+            {
+                announcement.Pictures = new List<AnnouncementPicture>();
+
+                foreach (var photo in files)
+                {
+                    using (var memoryStream = new MemoryStream())
+                    {
+                        photo.CopyTo(memoryStream);
+                        var picture = new AnnouncementPicture
+                        {
+                            ImageData = memoryStream.ToArray(),
+                        };
+                        announcement.Pictures.Add(picture);
+                    }
+                }
+            }
+
         }
     }
 }

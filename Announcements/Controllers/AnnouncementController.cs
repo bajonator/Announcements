@@ -92,7 +92,7 @@ namespace Announcements.Controllers
             var userId = User.GetUserId();
             announcement.UserId = userId;
 
-            AddPhoto(announcement);
+            _announcementService.AddPhoto(announcement, files);
 
             if (!ModelState.IsValid)
             {
@@ -117,28 +117,6 @@ namespace Announcements.Controllers
             return RedirectToAction("Announcements");
         }
 
-        private void AddPhoto(Announcement announcement)
-        {
-            var photos = Request.Form.Files;
-
-            if (photos != null && photos.Count > 0)
-            {
-                announcement.Pictures = new List<AnnouncementPicture>();
-
-                foreach (var photo in photos)
-                {
-                    using (var memoryStream = new MemoryStream())
-                    {
-                        photo.CopyTo(memoryStream);
-                        var picture = new AnnouncementPicture
-                        {
-                            ImageData = memoryStream.ToArray(),
-                        };
-                        announcement.Pictures.Add(picture);
-                    }
-                }
-            }
-        }
 
         [HttpPost]
         public IActionResult Delete(int id)

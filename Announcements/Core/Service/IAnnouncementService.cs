@@ -1,5 +1,6 @@
 ﻿using Announcements.Core.Domains;
 using Announcements.Core.Models.Domains;
+using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
 
 namespace Announcements.Core.Service
@@ -14,6 +15,7 @@ namespace Announcements.Core.Service
         void Delete(int id, string userId);
         Announcement GetPreview(int id);
         IEnumerable<AnnouncementPicture> GetPictures(int id);
+        void AddPhoto(Announcement announcement, List<IFormFile> files);
     }
     
 }
